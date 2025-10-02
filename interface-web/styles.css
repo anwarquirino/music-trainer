@@ -1,0 +1,61 @@
+:root {
+  --glass-bg: rgba(255, 255, 255, 0.16);
+  --glass-border: rgba(255, 255, 255, 0.25);
+  --glass-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+}
+
+html, body {
+  height: 100%;
+}
+
+body {
+  min-height: 100vh;
+  background:
+    radial-gradient(1200px 600px at 10% 10%, #1d4ed8 0%, transparent 60%),
+    radial-gradient(900px 500px at 90% 30%, #9333ea 0%, transparent 55%),
+    radial-gradient(700px 400px at 30% 90%, #10b981 0%, transparent 50%),
+    #0b1020;
+}
+
+.glass {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+.neu {
+  box-shadow:
+    8px 8px 20px rgba(0,0,0,0.35),
+    -6px -6px 16px rgba(255,255,255,0.06) inset,
+    6px 6px 16px rgba(0,0,0,0.35) inset;
+}
+
+.pulse {
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.5; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.02); }
+}
+
+/* barra de progresso */
+.bar {
+  height: 10px;
+  border-radius: 9999px;
+  background: linear-gradient(90deg, #22c55e, #eab308, #ef4444);
+  transition: width 250ms ease;
+}
+
+.bar-bg {
+  height: 10px;
+  border-radius: 9999px;
+  background: rgba(255,255,255,0.12);
+}
+
+/* fallback */
+@supports not ((backdrop-filter: blur(10px)) or (-webkit-backdrop-filter: blur(10px))) {
+  .glass { background: rgba(25, 33, 60, 0.75); }
+}
