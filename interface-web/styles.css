@@ -55,7 +55,17 @@ body {
   background: rgba(255,255,255,0.12);
 }
 
+/* Webcam container */
+#webcam-container canvas {
+  width: 100%;
+  height: auto;
+  border-radius: 12px;
+  transform: scaleX(-1);
+}
+
+
 /* fallback */
 @supports not ((backdrop-filter: blur(10px)) or (-webkit-backdrop-filter: blur(10px))) {
   .glass { background: rgba(25, 33, 60, 0.75); }
 }
+
