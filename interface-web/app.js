@@ -1,40 +1,84 @@
-// URL do modelo de áudio do Teachable Machine
-const audioURL = "https://teachablemachine.withgoogle.com/models/X4RvKRucp/";
-/* URL do modelo de imagem do Teachable Machine (Falta o Vitor mandar o link pra copiar a URL)
- * Link do modelo do Ícaro enviado como gambiarra como prova da integração bem-sucedida com a Webcam */
-const imageURL = "https://teachablemachine.withgoogle.com/models/5HtSQCDyD/";
+/* ============================================================
+   Music Trainer - Reconhecimento Multimodal (Áudio + Imagem)
+   Desenvolvido para integrar modelos do Teachable Machine
+   ============================================================ */
 
+// URLs dos modelos exportados do Teachable Machine
+const audioURL = "https://teachablemachine.withgoogle.com/models/X4RvKRucp/"; // Áudio
+const imageURL = "https://teachablemachine.withgoogle.com/models/5HtSQCDyD/"; // Imagem
+
+// Variáveis globais
 let recognizer, imageModel, webcam;
-let audioClassLabels, imageClassLabels;
+let audioClassLabels = [], imageClassLabels = [];
 let isAnalyzing = false;
-let imageLoopRequestID;
+let imageLoopRequestID = null;
 
+// Referências de elementos HTML
 const startBtn = document.getElementById("start-btn");
 const statusDot = document.getElementById("status-dot");
 const statusText = document.getElementById("status-text");
-const labelsWrapper = document.getElementById("labels-wrapper");
 const audioLabelsWrapper = document.getElementById("audio-labels-wrapper");
 const imageLabelsWrapper = document.getElementById("image-labels-wrapper");
 const webcamContainer = document.getElementById("webcam-container");
 
-function setStatus(color, text, pulse=false) {
-  statusDot.className = "absolute inline-flex h-3 w-3 rounded-full " + color + (pulse ? " pulse" : "");
+/* ============================================================
+   Funções auxiliares
+   ============================================================ */
+
+// Atualiza o status visual (cor e texto)
+function setStatus(color, text, pulse = false) {
+  statusDot.className =
+    "absolute inline-flex h-3 w-3 rounded-full " +
+    color +
+    (pulse ? " animate-pulse" : "");
   statusText.textContent = text;
 }
 
+/* ============================================================
+   1. Carregamento e configuração dos modelos
+   ============================================================ */
+
+// --- Modelo de Áudio ---
 async function createAudioModel() {
-  const checkpointURL = URL + "model.json";
-  const metadataURL = URL + "metadata.json";
-  const rec = speechCommands.create("BROWSER_FFT", undefined, checkpointURL, metadataURL);
+  const checkpointURL = audioURL + "model.json";
+  const metadataURL = audioURL + "metadata.json";
+
+  const rec = speechCommands.create(
+    "BROWSER_FFT",
+    undefined,
+    checkpointURL,
+    metadataURL
+  );
   await rec.ensureModelLoaded();
   return rec;
 }
 
+// --- Modelo de Imagem + Webcam ---
+async function createImageModelAndWebcam() {
+  const modelURL = imageURL + "model.json";
+  const metadataURL = imageURL + "metadata.json";
+
+  imageModel = await tmImage.load(modelURL, metadataURL);
+  imageClassLabels = imageModel.getClassLabels();
+
+  const flip = true; // espelha a imagem horizontalmente
+  webcam = new tmImage.Webcam(400, 400, flip);
+  await webcam.setup();
+  await webcam.play();
+  webcamContainer.appendChild(webcam.canvas);
+}
+
+/* ============================================================
+   2. Renderização das barras de confiança
+   ============================================================ */
+
+// --- Áudio ---
 function renderAudioLabelRows(labels) {
-  labelsWrapper.innerHTML = "";
+  audioLabelsWrapper.innerHTML = "";
   labels.forEach((label, idx) => {
     const row = document.createElement("div");
-    row.className = "grid grid-cols-1 sm:grid-cols-5 items-center gap-3 bg-white/5 rounded-xl p-3 ring-1 ring-white/10";
+    row.className =
+      "grid grid-cols-1 sm:grid-cols-5 items-center gap-3 bg-white/5 rounded-xl p-3 ring-1 ring-white/10";
     row.innerHTML = `
       <div class="sm:col-span-2 flex items-center gap-2">
         <div class="h-2 w-2 rounded-full bg-white/40"></div>
@@ -42,10 +86,10 @@ function renderAudioLabelRows(labels) {
       </div>
       <div class="sm:col-span-3">
         <div class="bar-bg">
-          <div class="bar" id="bar-${idx}" style="width: 0%"></div>
+          <div class="bar bg-emerald-500 h-2 rounded" id="audio-bar-${idx}" style="width: 0%"></div>
         </div>
         <div class="mt-1 text-xs text-slate-300">
-          <span id="val-${idx}">0.00</span>
+          <span id="audio-val-${idx}">0.00</span>
         </div>
       </div>
     `;
@@ -56,87 +100,83 @@ function renderAudioLabelRows(labels) {
 function updateAudioBars(scores) {
   for (let i = 0; i < audioClassLabels.length; i++) {
     const p = Math.max(0, Math.min(1, scores[i] || 0));
-    const w = (p * 100).toFixed(0) + "%";
     const bar = document.getElementById("audio-bar-" + i);
     const val = document.getElementById("audio-val-" + i);
-    if (bar) bar.style.width = w;
+    if (bar) bar.style.width = (p * 100).toFixed(0) + "%";
     if (val) val.textContent = p.toFixed(2);
   }
 }
 
-// Funções novas para Webcam
-async function createImageModelAndWebcam() {
-    const modelURL = IMAGE_URL + "model.json";
-    const metadataURL = IMAGE_URL + "metadata.json";
-    imageModel = await tmImage.load(modelURL, metadataURL);
-    imageClassLabels = imageModel.getClassLabels();
-
-    const flip = true;
-    webcam = new tmImage.Webcam(800, 800, flip);
-    await webcam.setup();
-    await webcam.play();
-
-    await new Promise(resolve => setTimeout(resolve, 500));
-
-    webcamContainer.appendChild(webcam.canvas);
-}
-
+// --- Imagem ---
 function renderImageLabelRows(labels) {
-    imageLabelsWrapper.innerHTML = "";
-    labels.forEach((label, idx) => {
-        const row = document.createElement("div");
-        row.className = "grid grid-cols-1 sm:grid-cols-5 items-center gap-3 bg-white/5 rounded-xl p-3 ring-1 ring-white/10";
-        row.innerHTML = `
-          <div class="sm:col-span-2 flex items-center gap-2">
-            <div class="h-2 w-2 rounded-full bg-white/40"></div>
-            <div class="font-medium">${label}</div>
-          </div>
-          <div class="sm:col-span-3">
-            <div class="bar-bg">
-              <div class="bar" id="image-bar-${idx}" style="width: 0%"></div>
-            </div>
-            <div class="mt-1 text-xs text-slate-300">
-              <span id="image-val-${idx}">0.00</span>
-            </div>
-          </div>
-        `;
-        imageLabelsWrapper.appendChild(row);
-    });
+  imageLabelsWrapper.innerHTML = "";
+  labels.forEach((label, idx) => {
+    const row = document.createElement("div");
+    row.className =
+      "grid grid-cols-1 sm:grid-cols-5 items-center gap-3 bg-white/5 rounded-xl p-3 ring-1 ring-white/10";
+    row.innerHTML = `
+      <div class="sm:col-span-2 flex items-center gap-2">
+        <div class="h-2 w-2 rounded-full bg-white/40"></div>
+        <div class="font-medium">${label}</div>
+      </div>
+      <div class="sm:col-span-3">
+        <div class="bar-bg">
+          <div class="bar bg-sky-500 h-2 rounded" id="image-bar-${idx}" style="width: 0%"></div>
+        </div>
+        <div class="mt-1 text-xs text-slate-300">
+          <span id="image-val-${idx}">0.00</span>
+        </div>
+      </div>
+    `;
+    imageLabelsWrapper.appendChild(row);
+  });
 }
 
 function updateImageBars(prediction) {
-    for (let i = 0; i < imageClassLabels.length; i++) {
-        const classPrediction = prediction.find(p => p.className === imageClassLabels[i]);
-        const p = classPrediction ? classPrediction.probability : 0;
-        const w = (p * 100).toFixed(0) + "%";
-        const bar = document.getElementById("image-bar-" + i);
-        const val = document.getElementById("image-val-" + i);
-        if (bar) bar.style.width = w;
-        if (val) val.textContent = p.toFixed(2);
-    }
+  for (let i = 0; i < imageClassLabels.length; i++) {
+    const classPrediction = prediction.find(
+      (p) => p.className === imageClassLabels[i]
+    );
+    const p = classPrediction ? classPrediction.probability : 0;
+    const bar = document.getElementById("image-bar-" + i);
+    const val = document.getElementById("image-val-" + i);
+    if (bar) bar.style.width = (p * 100).toFixed(0) + "%";
+    if (val) val.textContent = p.toFixed(2);
+  }
 }
+
+/* ============================================================
+   3. Loop de predição contínua da câmera
+   ============================================================ */
 
 async function imagePredictionLoop() {
   webcam.update();
   const prediction = await imageModel.predict(webcam.canvas);
   updateImageBars(prediction);
   if (isAnalyzing) {
-    imageLoopRequestID = window.requestAnimationFrame(imagePresictionLoop);
+    imageLoopRequestID = window.requestAnimationFrame(imagePredictionLoop);
   }
 }
 
-// Função de controle principal alterada
+/* ============================================================
+   4. Controle principal (Iniciar / Parar)
+   ============================================================ */
+
 async function toggleAnalysis() {
   try {
+    // Caso ainda não tenha carregado os modelos
     if (!recognizer || !imageModel) {
-      setStatus("bg-yellow-400", "Carregando modelo...", true);
+      setStatus("bg-yellow-400", "Carregando modelos...", true);
       startBtn.disabled = true;
       startBtn.classList.add("opacity-60", "cursor-not-allowed");
 
+      // Carrega modelos
       recognizer = await createAudioModel();
-      classLabels = recognizer.wordLabels();
+      audioClassLabels = recognizer.wordLabels();
       renderAudioLabelRows(audioClassLabels);
 
+      await createImageModelAndWebcam();
+      renderImageLabelRows(imageClassLabels);
 
       startBtn.disabled = false;
       startBtn.classList.remove("opacity-60", "cursor-not-allowed");
@@ -145,30 +185,38 @@ async function toggleAnalysis() {
       return;
     }
 
+    // Alterna entre iniciar e parar a análise
     isAnalyzing = !isAnalyzing;
 
     if (isAnalyzing) {
-      setStatus("bg-sky-400", "Escutando...", true);
+      setStatus("bg-sky-400", "Analisando áudio e imagem...", true);
       startBtn.textContent = "Parar";
-      listening = true;
-      
+
+      // Configura parâmetros de detecção do áudio
       const threshold = Number(document.getElementById("cfg-threshold").value);
       const overlap = Number(document.getElementById("cfg-overlap").value);
       const includeSpec = document.getElementById("cfg-spec").checked;
 
-      recognizer.listen(result => {
-        updateAudioBars(result.scores);
-      }, {
-        includeSpectrogram: includeSpec,
-        probabilityThreshold: threshold,
-        invokeCallbackOnNoiseAndUnknown: true,
-        overlapFactor: overlap
-      });
+      // Inicia escuta de áudio
+      recognizer.listen(
+        (result) => {
+          updateAudioBars(result.scores);
+        },
+        {
+          includeSpectrogram: includeSpec,
+          probabilityThreshold: threshold,
+          invokeCallbackOnNoiseAndUnknown: true,
+          overlapFactor: overlap,
+        }
+      );
+
+      // Inicia análise de imagem
+      imagePredictionLoop();
     } else {
       recognizer.stopListening();
-      window.cancelFrameAnimation(imageLoopRequestID);
+      window.cancelAnimationFrame(imageLoopRequestID);
       setStatus("bg-emerald-400", "Parado. Pronto para reiniciar.");
-      startBtn.textContent = "Continuar análise";
+      startBtn.textContent = "Iniciar Reconhecimento";
     }
   } catch (err) {
     console.error(err);
@@ -180,6 +228,4 @@ async function toggleAnalysis() {
   }
 }
 
-// Inicializa o botão
 startBtn.addEventListener("click", toggleAnalysis);
-
