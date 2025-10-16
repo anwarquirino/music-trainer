@@ -1,0 +1,70 @@
+MUSIC TRAINER
+
+Resumo: Repositório: music-trainer projeto avaliativo para a matéria IA2.
+
+
+Estrutura de alto nível: interface-web, modelo-audio, modelo_imagem / modelo-imagem modelos/artefatos de ML e a interface web. Linguagens principais: JavaScript, HTML, CSS.
+
+
+Status observável: sem releases, sem issues abertas, 14 commits no histórico.
+
+
+1) Informações do repositório
+Nome: music-trainer.
+Branch principal: main.
+Linguagens: JavaScript / HTML / CSS.
+
+
+2) Checklist de inspeção estática (code review superficial)
+README com instruções de instalação e uso.
+
+
+Estrutura de pastas consistente.
+
+Arquivo de licença presente.
+
+
+CI configurada (GitHub Actions, etc.)
+
+
+3) Checklist de execução (manual)
+
+Pré-requisitos: Node.js >= 16, npm/yarn, Python ou libs para modelos (se houver).
+
+
+Instalação: npm install (ou yarn).
+
+
+Executar a interface: npm run dev ou npm start.
+
+
+Testes: npm test
+
+
+Resultado esperado: aplicação serve a interface web localmente.
+4) Plano de testes recomendado
+Testes de instalação e start (smoke tests) — prioridade alta.
+
+
+Testes funcionais (fluxo principal do usuário na interface): abrir exercício, ouvir áudio, responder, receber feedback.
+
+
+Testes de integração: submissão de áudio/imagem → resposta do modelo.
+
+
+Testes de performance leve: latência de inferência de modelo em máquina local.
+
+
+Testes de compatibilidade de navegador se for web.
+
+
+5) Bugs / problemas detectados (priorizados — sugestões baseadas em inspeção superficial)
+P0 — Documentação insuficiente: README curto sem instruções de execução. (Criticidade: alta). Sugestão: README com passos de instalação, execução, exemplos, e contato.
+
+
+P1 — Nomes de pastas inconsistentes: modelo_imagem vs modelo-imagem. 
+Sugestão: padronizar nomes e remover duplicatas.
+
+
+P2 — Falta de CI / testes automatizados: adicionar GitHub Actions para lint, testes e build.
+
