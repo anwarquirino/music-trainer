@@ -34,10 +34,3 @@ Rode em modo de desenvolvimento:
 npm run dev
 # ou
 npm start
-
-Licença
-
-(Adicionar licença. Ex: MIT)
-
-
-## 2) QA_CHECKLIST.md (arquivo pronto)
