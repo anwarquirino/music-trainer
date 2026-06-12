@@ -17,7 +17,7 @@ music-trainer/
 │   ├── app.js
 │   └── styles.css
 ├── modelo-audio/       # Artefatos do modelo de áudio (TensorFlow.js)
-└── modelo-imagem/      # Artefatos do modelo de imagem
+└── modelo_imagem/      # Artefatos do modelo de imagem
 ```
 
 ## ▶️ Como executar
