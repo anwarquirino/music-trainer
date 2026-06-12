@@ -1,36 +1,47 @@
-# music-trainer
-Projeto avaliativo para a matéria de IA2
+# 🎵 Music Trainer
 
-1) README.md — proposta ampliada (texto pronto)
-# music-trainer
+Aplicação de treino musical baseada em **Machine Learning no navegador**, desenvolvida como projeto avaliativo da disciplina **IA2**. Usa modelos treinados no [Teachable Machine](https://teachablemachine.withgoogle.com/) para reconhecer áudio e imagem diretamente no front-end.
 
-Projeto avaliativo para a matéria IA2.
+## ✨ O que faz
 
-## Descrição
-Aplicação para treino musical (interface web + modelos de áudio/imagem). Este repositório contém:
-- `interface-web`: front-end (HTML/CSS/JS).
-- `modelo-audio`: artefatos/arquivos do modelo de áudio.
-- `modelo-imagem` / `modelo_imagem`: artefatos do modelo de imagem.
+- Interface web que carrega modelos de ML treinados (áudio e imagem)
+- Classificação em tempo real no navegador, sem backend
+- Modelos exportados do Teachable Machine (TensorFlow.js)
 
-## Requisitos
-- Node.js >= 16
-- npm ou yarn
-- (Opcional) Python 3.8+ para scripts de conversão / treino de modelos
+## 📁 Estrutura
 
-## Instalação
-1. Clone o repositório:
-   ```bash
-   git clone https://github.com/anwarquirino/music-trainer.git
-   cd music-trainer/interface-web
+```
+music-trainer/
+├── interface-web/      # Front-end (HTML, CSS, JS)
+│   ├── index.html
+│   ├── app.js
+│   └── styles.css
+├── modelo-audio/       # Artefatos do modelo de áudio (TensorFlow.js)
+└── modelo-imagem/      # Artefatos do modelo de imagem
+```
 
+## ▶️ Como executar
 
-Instale dependências:
+Por ser um front-end estático que carrega modelos via `fetch`, basta servir a pasta por HTTP (abrir o `index.html` direto no `file://` costuma bloquear o carregamento dos modelos por CORS).
 
-npm install
+```bash
+git clone https://github.com/anwarquirino/music-trainer.git
+cd music-trainer/interface-web
 
-
-Rode em modo de desenvolvimento:
-
-npm run dev
+# Suba um servidor estático simples (escolha um):
+python -m http.server 8000
 # ou
-npm start
+npx serve .
+```
+
+Depois acesse `http://localhost:8000` no navegador.
+
+## 🛠️ Tecnologias
+
+- HTML5 / CSS3 / JavaScript
+- TensorFlow.js
+- Teachable Machine (treino dos modelos)
+
+## 📚 Contexto
+
+Projeto acadêmico da matéria de Inteligência Artificial (IA2).
