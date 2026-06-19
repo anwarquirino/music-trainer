@@ -1,14 +1,14 @@
-# 🎵 Music Trainer
+# Music Trainer
 
 Aplicação de treino musical baseada em **Machine Learning no navegador**, desenvolvida como projeto avaliativo da disciplina **IA2**. Usa modelos treinados no [Teachable Machine](https://teachablemachine.withgoogle.com/) para reconhecer áudio e imagem diretamente no front-end.
 
-## ✨ O que faz
+## O que faz
 
 - Interface web que carrega modelos de ML treinados (áudio e imagem)
 - Classificação em tempo real no navegador, sem backend
 - Modelos exportados do Teachable Machine (TensorFlow.js)
 
-## 📁 Estrutura
+## Estrutura
 
 ```
 music-trainer/
@@ -20,7 +20,7 @@ music-trainer/
 └── modelo_imagem/      # Artefatos do modelo de imagem
 ```
 
-## ▶️ Como executar
+## Como executar
 
 Por ser um front-end estático que carrega modelos via `fetch`, basta servir a pasta por HTTP (abrir o `index.html` direto no `file://` costuma bloquear o carregamento dos modelos por CORS).
 
@@ -36,12 +36,12 @@ npx serve .
 
 Depois acesse `http://localhost:8000` no navegador.
 
-## 🛠️ Tecnologias
+## Tecnologias
 
 - HTML5 / CSS3 / JavaScript
 - TensorFlow.js
 - Teachable Machine (treino dos modelos)
 
-## 📚 Contexto
+## Contexto
 
 Projeto acadêmico da matéria de Inteligência Artificial (IA2).
